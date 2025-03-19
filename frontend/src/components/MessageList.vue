@@ -3,8 +3,8 @@
     <h2>🔔 Recent Notifications</h2>
     <ul v-if="messages.length > 0">
       <li v-for="(msg, index) in messages" :key="index">
-        <strong>[{{ msg.timestamp }}] {{ msg.username }}</strong> in #{{ msg.channel }}:
-        {{ msg.content }}
+        <strong>[{{ msg.timestamp }}] {{ msg.username }}</strong
+        >: {{ msg.content }}
       </li>
     </ul>
     <p v-else>No notifications yet...</p>
@@ -13,8 +13,10 @@
 
 <script setup>
 import { useSocketStore } from '@/stores/useSocketStore'
+import { storeToRefs } from 'pinia'
 
-const { messages } = useSocketStore()
+const socketStore = useSocketStore()
+const { messages } = storeToRefs(socketStore) // ✅ Ensure reactivity
 </script>
 
 <style scoped>

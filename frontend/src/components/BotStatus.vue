@@ -9,8 +9,12 @@
 
 <script setup>
 import { useSocketStore } from '@/stores/useSocketStore'
+import { storeToRefs } from 'pinia'
 
-const { botStatus } = useSocketStore()
+const socketStore = useSocketStore()
+const { botStatus } = storeToRefs(socketStore) // ✅ Make `botStatus` reactive
+
+console.log('Component Loaded - Initial Bot Status:', botStatus.value) // ✅ Debug Log
 </script>
 
 <style scoped>
