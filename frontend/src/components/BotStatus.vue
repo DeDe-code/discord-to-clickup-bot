@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { useSocketStore } from '@/stores/useSocketStore'
+import { useSocketStore } from '@/stores/useBotStore'
 import { storeToRefs } from 'pinia'
 
 const socketStore = useSocketStore()

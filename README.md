@@ -1,26 +1,6 @@
-# Discord to ClickU## 🏗️ Architecture
+# Discord to ClickUp Bot 🤖
 
-```
-discord-to-clickup-bot/
-├── 📁 backend/
-│   └── 🚀 laravel-server/           # Complete Laravel application
-│       ├── 🤖 app/Console/Commands/DiscordBotStart.php  # Discord bot command
-│       ├── 🔧 app/Services/         # ClickUp & Discord services
-│       ├── 🎯 app/Http/Controllers/ # API controllers
-│       ├── 🗄️ database/            # Migrations and SQLite database
-│       ├── 📋 storage/logs/         # Application logs
-│       └── 🔐 .env                 # Environment configuration
-├── 📁 frontend/                     # Vue.js management interface
-├── 📖 project-summary.md           # Complete development timeline
-└── 📝 README.md                    # This file
-```
-
-### 🎯 Current Architecture (PHP-Only)
-- **🤖 Discord Bot**: Pure PHP implementation using `team-reflex/discord-php`
-- **🔄 Laravel Backend**: Complete API with database persistence
-- **🎨 Vue.js Frontend**: Management interface for monitoring
-- **🗄️ SQLite Database**: Message storage and bot status tracking
-- **📡 Real-time Processing**: WebSocket connection to Discord Gatewayal-time Discord bot that monitors Discord channels and automatically forwards messages to ClickUp chat channels.**
+**A real-time Discord bot that monitors Discord channels and automatically forwards messages to ClickUp chat channels.**
 
 [![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
