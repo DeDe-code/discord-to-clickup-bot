@@ -19,6 +19,7 @@ use App\Http\Controllers\DiscordWebhookController;
 
 // Bot status and control routes
 Route::get('/status', [BotController::class, 'status']);
+Route::get('/check-new-messages', [BotController::class, 'checkNewMessages']);
 Route::post('/bot/start', [BotController::class, 'startBot']);
 Route::post('/bot/stop', [BotController::class, 'stopBot']);
 Route::get('/messages', [BotController::class, 'getMessages']);

@@ -28,6 +28,26 @@ class BotController extends Controller
         return response()->json([
             'status' => $botStatus,
             'clickupAuth' => $clickupAuth,
+            'hasNewMessages' => cache()->has('new_message_available'),
+            'timestamp' => now()->toISOString()
+        ]);
+    }
+
+    /**
+     * Check if there are new messages (lightweight endpoint)
+     */
+    public function checkNewMessages(): JsonResponse
+    {
+        $hasNewMessages = cache()->has('new_message_available');
+        
+        if ($hasNewMessages) {
+            // Clear the flag when frontend checks
+            cache()->forget('new_message_available');
+        }
+        
+        return response()->json([
+            'hasNewMessages' => $hasNewMessages,
+            'timestamp' => now()->toISOString()
         ]);
     }
 
@@ -62,10 +82,28 @@ class BotController extends Controller
     /**
      * Get recent messages
      */
-    public function getMessages(): JsonResponse
+    public function getMessages(Request $request): JsonResponse
     {
-        $discordService = app(DiscordBotService::class);
-        $messages = $discordService->getRecentMessages();
+        $limit = $request->get('limit', 50);
+        $after = $request->get('after', 0);
+        
+        $query = \App\Models\DiscordMessage::orderBy('discord_timestamp', 'desc');
+        
+        // If 'after' parameter is provided, get messages newer than that ID
+        if ($after > 0) {
+            $query->where('discord_message_id', '>', $after);
+        }
+        
+        $messages = $query->limit($limit)->get()->map(function ($message) {
+            return [
+                'id' => $message->discord_message_id,
+                'username' => $message->username,
+                'content' => $message->content,
+                'timestamp' => $message->discord_timestamp,
+                'sent_to_clickup' => $message->clickup_sent ?? false
+            ];
+        });
+        
         return response()->json($messages);
     }
 

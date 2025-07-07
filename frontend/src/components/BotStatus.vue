@@ -8,11 +8,11 @@
 </template>
 
 <script setup>
-import { useSocketStore } from '@/stores/useBotStore'
+import { useBotStore } from '@/stores/useBotStore'
 import { storeToRefs } from 'pinia'
 
-const socketStore = useSocketStore()
-const { botStatus } = storeToRefs(socketStore) // ✅ Make `botStatus` reactive
+const botStore = useBotStore()
+const { botStatus } = storeToRefs(botStore) // ✅ Make `botStatus` reactive
 
 console.log('Component Loaded - Initial Bot Status:', botStatus.value) // ✅ Debug Log
 </script>

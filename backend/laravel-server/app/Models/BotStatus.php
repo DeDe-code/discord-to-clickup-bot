@@ -52,9 +52,34 @@ class BotStatus extends Model
      */
     public function isOnline(): bool
     {
-        // Consider service offline if last ping was more than 5 minutes ago
-        return $this->is_online && 
-               $this->last_ping && 
+        // First check if the database status is online
+        if (!$this->is_online) {
+            return false;
+        }
+
+        // For Discord bot, check if the process is actually running
+        if ($this->service_name === 'discord-bot') {
+            return $this->isDiscordBotProcessRunning();
+        }
+
+        // For other services, use the ping-based approach
+        return $this->last_ping && 
                $this->last_ping->greaterThan(now()->subMinutes(5));
+    }
+
+    /**
+     * Check if Discord bot process is running
+     */
+    private function isDiscordBotProcessRunning(): bool
+    {
+        try {
+            // Check if the discord:start process is running
+            $output = shell_exec('pgrep -f "discord:start" 2>/dev/null');
+            return !empty(trim($output));
+        } catch (\Exception $e) {
+            // If we can't check the process, fall back to ping-based check
+            return $this->last_ping && 
+                   $this->last_ping->greaterThan(now()->subMinutes(10)); // More lenient for fallback
+        }
     }
 }

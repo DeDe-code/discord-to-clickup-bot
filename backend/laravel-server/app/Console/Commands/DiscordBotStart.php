@@ -81,12 +81,57 @@ class DiscordBotStart extends Command
                     'metadata' => json_encode([
                         'started_at' => now()->toISOString(),
                         'status' => 'online',
-                        'bot_user' => $discord->user->username . '#' . $discord->user->discriminator
+                        'bot_user' => $discord->user->username . '#' . $discord->user->discriminator,
+                        'connection_status' => 'connected'
                     ])
                 ]
             );
             
             Log::info('🤖 Discord bot is online and ready!');
+        });
+
+        // Connection closed event
+        $discord->on('close', function ($code, $reason) {
+            $this->error("❌ Discord connection closed: Code {$code}, Reason: {$reason}");
+            
+            // Update bot status to offline
+            BotStatus::updateOrCreate(
+                ['service_name' => 'discord-bot'],
+                [
+                    'is_online' => false,
+                    'last_ping' => now(),
+                    'metadata' => json_encode([
+                        'status' => 'offline',
+                        'connection_status' => 'disconnected',
+                        'disconnect_reason' => $reason,
+                        'disconnect_code' => $code,
+                        'disconnected_at' => now()->toISOString()
+                    ])
+                ]
+            );
+            
+            Log::error("Discord connection closed: Code {$code}, Reason: {$reason}");
+        });
+
+        // Reconnect event
+        $discord->on('reconnect', function () {
+            $this->info('🔄 Discord bot reconnecting...');
+            
+            // Update bot status to reconnecting
+            BotStatus::updateOrCreate(
+                ['service_name' => 'discord-bot'],
+                [
+                    'is_online' => true,
+                    'last_ping' => now(),
+                    'metadata' => json_encode([
+                        'status' => 'reconnecting',
+                        'connection_status' => 'reconnecting',
+                        'reconnect_at' => now()->toISOString()
+                    ])
+                ]
+            );
+            
+            Log::info('Discord bot reconnecting...');
         });
 
         // Message received event
@@ -133,6 +178,8 @@ class DiscordBotStart extends Command
         
         if ($existingMessage) {
             $this->info("⚠️ Message already processed: {$message->id}");
+            // Still mark as new message available for frontend
+            cache()->put('new_message_available', true, 300);
             return;
         }
 
@@ -149,6 +196,9 @@ class DiscordBotStart extends Command
             ]);
 
             Log::info("💾 Saved Discord message to database: {$message->id}");
+            
+            // Mark that there's a new message for frontend polling (always, regardless of ClickUp)
+            cache()->put('new_message_available', true, 300); // 5 minutes cache
         } catch (\Illuminate\Database\QueryException $e) {
             if (str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
                 $this->warn("⚠️ Duplicate message detected, skipping: {$message->id}");

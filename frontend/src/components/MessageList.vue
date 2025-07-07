@@ -12,11 +12,11 @@
 </template>
 
 <script setup>
-import { useSocketStore } from '@/stores/useBotStore'
+import { useBotStore } from '@/stores/useBotStore'
 import { storeToRefs } from 'pinia'
 
-const socketStore = useSocketStore()
-const { messages } = storeToRefs(socketStore) // ✅ Ensure reactivity
+const botStore = useBotStore()
+const { messages } = storeToRefs(botStore) // ✅ Ensure reactivity
 </script>
 
 <style scoped>
