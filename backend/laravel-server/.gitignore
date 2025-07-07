@@ -1,0 +1,59 @@
+# Environment files - NEVER COMMIT
+.env
+.env.backup
+.env.production
+.env.local
+
+# Dependencies
+/vendor/
+
+# Database
+database.sqlite
+database/*.sqlite
+database/*.sqlite3
+*.db
+
+# API Keys and Tokens - NEVER COMMIT
+storage/app/clickup_token.json
+*token*.json
+
+# Laravel Storage
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/public/*
+/storage/debugbar/
+
+# Laravel Bootstrap Cache
+/bootstrap/cache/*
+!bootstrap/cache/.gitkeep
+
+# Public Storage
+/public/storage
+/public/hot
+
+# IDE
+/.vscode/
+/.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (if present)
+node_modules/
+npm-debug.log*
+
+# Logs
+*.log
+
+# Test files
+phpunit.xml
+.phpunit.result.cache
+
+# Backup files
+*.bak
+*.backup

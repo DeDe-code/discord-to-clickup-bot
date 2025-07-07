@@ -1,2 +1,31 @@
-node_modules
+# Environment files - NEVER COMMIT
 .env
+.env.*
+!.env.example
+
+# API Keys and Tokens - NEVER COMMIT
+clickup_token.json
+*token*.json
+
+# Laravel specific
+laravel-server/vendor/
+laravel-server/storage/logs/*.log
+laravel-server/storage/framework/cache/
+laravel-server/storage/framework/sessions/
+laravel-server/storage/framework/views/
+laravel-server/bootstrap/cache/
+laravel-server/.env.backup
+
+# Database
+*.sqlite
+*.sqlite3
+laravel-server/database/database.sqlite
+
+# Node.js (obsolete files)
+node_modules/
+package-lock.json
+server.js
+
+# Logs and temporary files
+*.log
+*.tmp
