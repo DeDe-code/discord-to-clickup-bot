@@ -3,6 +3,7 @@
 ## ✅ SAFE TO COMMIT (These files should be in GitHub)
 
 ### Documentation
+
 - ✅ `README.md` - Project documentation
 - ✅ `project-summary.md` - Development timeline
 - ✅ `project-diary.md` - Development log
@@ -10,6 +11,7 @@
 - ✅ `.env.example` - Environment template (no secrets)
 
 ### Application Code
+
 - ✅ `backend/laravel-server/app/` - All PHP application code
 - ✅ `backend/laravel-server/config/` - Laravel configuration
 - ✅ `backend/laravel-server/database/migrations/` - Database schema
@@ -20,32 +22,38 @@
 - ✅ `frontend/package.json` - Frontend dependencies
 
 ### Configuration
+
 - ✅ `.gitignore` files - Git ignore rules
 - ✅ `backend/laravel-server/.env.example` - Laravel env template
 
 ## ❌ NEVER COMMIT (These contain secrets or are too large)
 
 ### Sensitive Files with API Keys/Tokens
+
 - ❌ `backend/.env` - Contains API secrets
-- ❌ `backend/laravel-server/.env` - Contains API secrets  
+- ❌ `backend/laravel-server/.env` - Contains API secrets
 - ❌ `backend/clickup_token.json` - OAuth token
 - ❌ `backend/laravel-server/storage/app/clickup_token.json` - OAuth token
 - ❌ `frontend/.env` - May contain secrets
 
 ### Database Files
+
 - ❌ `backend/laravel-server/database/database.sqlite` - Contains data
 - ❌ Any `*.sqlite` or `*.db` files
 
 ### Dependencies (Too Large, Auto-Generated)
+
 - ❌ `backend/laravel-server/vendor/` - 84MB PHP packages
 - ❌ `node_modules/` - Node.js packages (if present)
 
 ### Logs and Temporary Files
+
 - ❌ `backend/laravel-server/storage/logs/*.log` - Runtime logs
 - ❌ `*.log` files anywhere
 - ❌ `backend/laravel-server/storage/framework/cache/` - Cache files
 
 ### Archives and Test Files
+
 - ❌ `Ddiscord-bot-backend.zip` - Archive file
 - ❌ `test_integration.php` - Temporary test file
 - ❌ `package-lock.json` (root level) - Obsolete file
@@ -87,6 +95,7 @@ git commit -m "Add Discord-to-ClickUp bot implementation
 ```
 
 ## 📋 SUMMARY
+
 - **Total files to commit**: ~50-100 source code files
 - **Files to exclude**: ~5000+ vendor files, logs, secrets
 - **Sensitive files protected**: 5+ environment/token files

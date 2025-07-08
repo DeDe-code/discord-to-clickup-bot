@@ -37,11 +37,13 @@ discord-to-clickup-bot/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **PHP** 8.3+ & **Composer** (for Laravel backend)
 - **Node.js** 18+ (for Vue.js frontend only)
 - **Discord Bot Token** & **ClickUp API Credentials**
 
 ### � Laravel Backend Setup
+
 ```bash
 cd backend/laravel-server
 composer install
@@ -52,6 +54,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 ```
 
 ### 🤖 Start Discord Bot
+
 ```bash
 cd backend/laravel-server
 php artisan discord:start
@@ -59,6 +62,7 @@ php artisan discord:start
 ```
 
 ### 🎨 Vue.js Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -69,6 +73,9 @@ npm run dev
 ## 🔧 Configuration
 
 ### Environment Variables (`.env`)
+
+**Important**: Channel mappings are now configured in `config/services.php`, not in `.env`. Only secrets and sensitive data belong in `.env`.
+
 ```env
 # Application
 APP_NAME="Discord ClickUp Bot Laravel"
@@ -77,36 +84,830 @@ APP_URL=http://localhost:8000
 # Authentication
 API_SECRET="your_api_secret_here"
 
-# Discord Configuration
+# Discord Configuration (secrets only)
 DISCORD_BOT_TOKEN=your_discord_bot_token
-WATCHED_CHANNEL_IDS=1087467843584532510
 
-# ClickUp Configuration
+# ClickUp Configuration (secrets only)
 CLICKUP_CLIENT_ID=your_clickup_client_id
 CLICKUP_CLIENT_SECRET=your_clickup_client_secret
 CLICKUP_WORKSPACE_ID=your_workspace_id
-CLICKUP_CHANNEL_ID=your_channel_id
 
 # Database
 DB_CONNECTION=sqlite
-DB_DATABASE=/path/to/your/database.sqlite
+DB_DATABASE=/absolute/path/to/your/database.sqlite
 ```
+
+### Channel Mappings Configuration (`config/services.php`)
+
+Channel mappings are configured in the services configuration file for better maintainability:
+
+```php
+'discord' => [
+    'bot_token' => env('DISCORD_BOT_TOKEN'),
+    'webhook_secret' => env('DISCORD_WEBHOOK_SECRET'),
+    'channel_mappings' => [
+        // Discord Channel ID => ClickUp Channel ID
+        '1087467843584532510' => '6-901209555432-8',        // INCIDENTS
+        '1087466485498265722' => '6-901209555434-8',        // WEBCAR_INCIDENTS
+        // Add more channel mappings here...
+    ],
+],
+```
+
+## 📚 Multi-Channel Configuration Guide
+
+### Overview
+
+The Discord-to-ClickUp bot supports monitoring **multiple Discord channels simultaneously** and forwarding messages to different ClickUp channels based on the source. This guide explains how to add additional channels beyond the default two-channel setup.
+
+### Current Channel Mapping System
+
+The bot uses a **channel mapping configuration** located in `backend/laravel-server/config/services.php`:
+
+```php
+'discord' => [
+    'bot_token' => env('DISCORD_BOT_TOKEN'),
+    'webhook_secret' => env('DISCORD_WEBHOOK_SECRET'),
+    'channel_mappings' => [
+        // Discord Channel ID => ClickUp Channel ID
+        '1087467843584532510' => '6-901209555432-8',        // INCIDENTS
+        '1087466485498265722' => '6-901209555434-8',        // WEBCAR_INCIDENTS
+    ],
+],
+```
+
+### Step-by-Step Guide: Adding New Channels
+
+#### Step 1: Obtain Discord Channel ID
+
+1. **Enable Developer Mode in Discord**:
+
+   - Open Discord → User Settings → Advanced → Enable "Developer Mode"
+
+2. **Get Channel ID**:
+   - Right-click on the target Discord channel
+   - Select "Copy Channel ID"
+   - Save this ID (e.g., `1234567890123456789`)
+
+#### Step 2: Obtain ClickUp Channel ID
+
+1. **Navigate to ClickUp Chat**:
+
+   - Open your ClickUp workspace
+   - Go to the target chat channel
+
+2. **Extract Channel ID from URL**:
+   - Copy the browser URL
+   - Format: `https://app.clickup.com/9001234567/v/ch/6-901209555999-9`
+   - Channel ID is the last part: `6-901209555999-9`
+
+#### Step 3: Update Configuration File
+
+1. **Edit the services configuration**:
+
+```bash
+nano backend/laravel-server/config/services.php
+```
+
+2. **Add new channel mapping**:
+
+```php
+'discord' => [
+    'bot_token' => env('DISCORD_BOT_TOKEN'),
+    'webhook_secret' => env('DISCORD_WEBHOOK_SECRET'),
+    'channel_mappings' => [
+        // Existing channels
+        '1087467843584532510' => '6-901209555432-8',        // INCIDENTS
+        '1087466485498265722' => '6-901209555434-8',        // WEBCAR_INCIDENTS
+
+        // NEW: Add your additional channels here
+        '1234567890123456789' => '6-901209555999-9',        // CUSTOM_ALERTS
+        '9876543210987654321' => '6-901209555888-8',        // SUPPORT_TICKETS
+        '5555555555555555555' => '6-901209555777-7',        // MAINTENANCE
+    ],
+],
+```
+
+#### Step 4: Restart the Discord Bot
+
+1. **Stop the current bot**:
+
+```bash
+pkill -f "discord:start"
+```
+
+2. **Restart with new configuration**:
+
+```bash
+cd backend/laravel-server
+php artisan discord:start
+```
+
+3. **Verify startup logs**:
+
+```
+🚀 Starting Discord bot...
+👀 Watching channels: 1087467843584532510, 1087466485498265722, 1234567890123456789, 9876543210987654321, 5555555555555555555
+📨 ClickUp channels: 6-901209555432-8, 6-901209555434-8, 6-901209555999-9, 6-901209555888-8, 6-901209555777-7
+✅ Discord bot is ready!
+```
+
+#### Step 5: Test the New Channels
+
+1. **Send test messages** in each new Discord channel
+
+2. **Verify in ClickUp** that messages appear in correct channels
+
+3. **Check API status**:
+
+```bash
+curl -X GET http://localhost:8000/api/status \
+  -H "X-API-Key: your_api_secret_here"
+```
+
+### Advanced Configuration Examples
+
+#### Example 1: Department-Specific Channels
+
+```php
+'channel_mappings' => [
+    // Development Team
+    '1111111111111111111' => '6-901209555111-1',        // DEV_BUGS
+    '1111111111111111112' => '6-901209555112-2',        // DEV_FEATURES
+
+    // Operations Team
+    '2222222222222222221' => '6-901209555221-1',        // OPS_INCIDENTS
+    '2222222222222222222' => '6-901209555222-2',        // OPS_MONITORING
+
+    // Customer Support
+    '3333333333333333331' => '6-901209555331-1',        // SUPPORT_URGENT
+    '3333333333333333332' => '6-901209555332-2',        // SUPPORT_GENERAL
+],
+```
+
+#### Example 2: Priority-Based Routing
+
+```php
+'channel_mappings' => [
+    '1111111111111111111' => '6-901209555111-1',        // CRITICAL_ALERTS
+    '2222222222222222222' => '6-901209555222-2',        // HIGH_PRIORITY
+    '3333333333333333333' => '6-901209555333-3',        // MEDIUM_PRIORITY
+    '4444444444444444444' => '6-901209555444-4',        // LOW_PRIORITY
+    '5555555555555555555' => '6-901209555555-5',        // INFORMATION_ONLY
+],
+```
+
+### Best Practices
+
+#### ✅ Recommended Practices
+
+1. **Use Descriptive Comments**: Always add comments explaining what each channel mapping does
+2. **Group Related Channels**: Organize mappings by team, priority, or function
+3. **Test Before Production**: Always test new channels in a development environment
+4. **Document Channel Purposes**: Maintain documentation of what each channel is used for
+5. **Monitor Bot Logs**: Check logs after adding channels to ensure proper operation
+
+#### ❌ Common Mistakes to Avoid
+
+1. **Duplicate Channel IDs**: Don't map the same Discord channel to multiple ClickUp channels
+2. **Invalid Channel IDs**: Always verify channel IDs exist and are accessible
+3. **Missing ClickUp Permissions**: Ensure the bot has access to all ClickUp channels
+4. **Forgetting to Restart**: Always restart the bot after configuration changes
+5. **No Testing**: Test each new channel mapping individually
+
+### Troubleshooting Multi-Channel Setup
+
+#### Common Multi-Channel Issues
+
+##### 1. Bot Not Monitoring New Channels
+
+**Symptoms**: New channels don't trigger message forwarding
+
+**Diagnosis**:
+
+```bash
+# Check if channel IDs are correct in config
+grep -A 20 "channel_mappings" backend/laravel-server/config/services.php
+
+# Verify bot startup logs show all channels
+tail -f backend/laravel-server/storage/logs/laravel.log | grep "Watching channels"
+
+# Check Discord bot permissions
+curl -X GET http://localhost:8000/api/status \
+  -H "X-API-Key: your_api_secret_here" | jq '.discord_bot.watched_channels'
+```
+
+**Solutions**:
+
+```bash
+# 1. Restart bot to pick up new configuration
+pkill -f "discord:start"
+cd backend/laravel-server && php artisan discord:start
+
+# 2. Verify channel ID format (should be 18-19 digits)
+echo "1087467843584532510" | wc -c  # Should output 19-20
+
+# 3. Test channel access manually
+curl -X POST http://localhost:8000/api/discord/simulate \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your_api_secret_here" \
+  -d '{"content": "Test", "username": "Test", "channel_id": "YOUR_CHANNEL_ID"}'
+```
+
+##### 2. Messages Not Appearing in Specific ClickUp Channels
+
+**Symptoms**: Some channels forward successfully, others don't
+
+**Diagnosis**:
+
+```bash
+# Check ClickUp authentication
+curl -X GET http://localhost:8000/api/auth/clickup/status \
+  -H "X-API-Key: your_api_secret_here"
+
+# Check for ClickUp-specific errors
+tail -f backend/laravel-server/storage/logs/laravel.log | grep -E "ClickUp|6-901209555"
+
+# Test specific ClickUp channel access
+grep "your_clickup_channel_id" backend/laravel-server/storage/logs/laravel.log
+```
+
+**Solutions**:
+
+```bash
+# 1. Verify ClickUp channel ID format
+# Should be like: 6-901209555432-8
+
+# 2. Check ClickUp channel permissions
+# Bot user must have access to ALL mapped channels
+
+# 3. Test individual channel
+curl -X POST http://localhost:8000/api/discord/simulate \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your_api_secret_here" \
+  -d '{
+    "content": "Test specific channel",
+    "username": "TestBot",
+    "channel_id": "WORKING_DISCORD_CHANNEL"
+  }'
+```
+
+##### 3. Configuration Syntax Errors
+
+**Symptoms**: Bot fails to start, PHP errors in logs
+
+**Diagnosis**:
+
+```bash
+# Validate PHP syntax
+php -l backend/laravel-server/config/services.php
+
+# Test configuration loading
+cd backend/laravel-server
+php artisan tinker --execute="dd(config('services.discord.channel_mappings'));"
+
+# Check for common syntax issues
+grep -n "=>" backend/laravel-server/config/services.php | grep -v "//"
+```
+
+**Solutions**:
+
+```bash
+# 1. Common fixes
+# - Missing commas after array elements
+# - Unmatched quotes or brackets
+# - Incorrect array syntax
+
+# 2. Validate JSON-like structure
+cat backend/laravel-server/config/services.php | grep -A 50 "channel_mappings"
+
+# 3. Use proper PHP array syntax
+'channel_mappings' => [
+    'discord_id' => 'clickup_id',  // ✅ Correct
+    "discord_id" => "clickup_id",  // ✅ Also correct
+    discord_id => clickup_id,      // ❌ Wrong - missing quotes
+],
+```
+
+##### 4. Memory or Performance Issues
+
+**Symptoms**: Bot becomes slow or crashes with many channels
+
+**Diagnosis**:
+
+```bash
+# Monitor memory usage
+watch -n 5 'ps -p $(pgrep -f "discord:start") -o pid,pcpu,pmem,time'
+
+# Check message processing times
+tail -f backend/laravel-server/storage/logs/laravel.log | grep "Processing time"
+
+# Count active channels
+php artisan tinker --execute="echo count(config('services.discord.channel_mappings'));"
+```
+
+**Solutions**:
+
+```bash
+# 1. Optimize configuration
+# Remove unused channels from mapping
+
+# 2. Increase PHP memory limit
+echo "memory_limit = 256M" >> backend/laravel-server/.env
+
+# 3. Implement queue system for high volumes
+php artisan queue:work --timeout=60
+
+# 4. Consider splitting channels across multiple bot instances
+```
+
+##### 5. Duplicate Channel Mappings
+
+**Symptoms**: Same Discord channel appears multiple times in config
+
+**Diagnosis**:
+
+```bash
+# Check for duplicate Discord channel IDs
+grep -o '"[0-9]\{18,19\}"' backend/laravel-server/config/services.php | sort | uniq -d
+
+# Verify unique mappings
+php artisan tinker --execute="
+\$mappings = config('services.discord.channel_mappings');
+\$unique = array_unique(array_keys(\$mappings));
+echo 'Total: ' . count(\$mappings) . ', Unique: ' . count(\$unique);
+"
+```
+
+**Solutions**:
+
+```bash
+# 1. Remove duplicate entries
+# Each Discord channel should map to only ONE ClickUp channel
+
+# 2. If you need one Discord channel to forward to multiple ClickUp channels,
+# implement custom logic in DiscordBotService.php
+
+# 3. Validate configuration after changes
+php -l backend/laravel-server/config/services.php
+```
+
+#### Advanced Debugging Techniques
+
+##### Debug Mode Setup
+
+```bash
+# Enable debug logging
+echo "LOG_LEVEL=debug" >> backend/laravel-server/.env
+
+# Restart with verbose logging
+php artisan discord:start --verbose
+
+# Watch debug output
+tail -f backend/laravel-server/storage/logs/laravel.log | grep -E "DEBUG|Channel|Message"
+```
+
+##### Configuration Validation Script
+
+```bash
+#!/bin/bash
+# File: validate-config.sh
+
+cd backend/laravel-server
+
+echo "🔍 Validating Multi-Channel Configuration"
+echo "========================================"
+
+# 1. PHP Syntax Check
+if php -l config/services.php > /dev/null 2>&1; then
+    echo "✅ PHP Syntax: Valid"
+else
+    echo "❌ PHP Syntax: Invalid"
+    php -l config/services.php
+    exit 1
+fi
+
+# 2. Check Channel Mappings Count
+CHANNEL_COUNT=$(php artisan tinker --execute="echo count(config('services.discord.channel_mappings'));" 2>/dev/null)
+echo "📊 Total Channels: $CHANNEL_COUNT"
+
+# 3. Validate Discord Channel ID Format
+echo "🔍 Validating Discord Channel IDs..."
+php artisan tinker --execute="
+foreach(config('services.discord.channel_mappings') as \$discord => \$clickup) {
+    if (!preg_match('/^[0-9]{18,19}$/', \$discord)) {
+        echo 'Invalid Discord ID: ' . \$discord . '\n';
+    }
+}
+" 2>/dev/null
+
+# 4. Validate ClickUp Channel ID Format
+echo "🔍 Validating ClickUp Channel IDs..."
+php artisan tinker --execute="
+foreach(config('services.discord.channel_mappings') as \$discord => \$clickup) {
+    if (!preg_match('/^6-[0-9]+-[0-9]+$/', \$clickup)) {
+        echo 'Invalid ClickUp ID: ' . \$clickup . '\n';
+    }
+}
+" 2>/dev/null
+
+# 5. Check for Duplicates
+echo "🔍 Checking for Duplicate Mappings..."
+php artisan tinker --execute="
+\$mappings = config('services.discord.channel_mappings');
+\$discordIds = array_keys(\$mappings);
+\$duplicateDiscord = array_diff_assoc(\$discordIds, array_unique(\$discordIds));
+if (!empty(\$duplicateDiscord)) {
+    echo 'Duplicate Discord IDs found: ' . implode(', ', \$duplicateDiscord) . '\n';
+}
+
+\$clickupIds = array_values(\$mappings);
+\$duplicateClickUp = array_diff_assoc(\$clickupIds, array_unique(\$clickupIds));
+if (!empty(\$duplicateClickUp)) {
+    echo 'Duplicate ClickUp IDs found: ' . implode(', ', \$duplicateClickUp) . '\n';
+}
+" 2>/dev/null
+
+echo "✅ Configuration validation complete!"
+```
+
+##### Performance Testing Script
+
+```bash
+#!/bin/bash
+# File: test-performance.sh
+
+API_KEY="your_api_secret_here"
+BASE_URL="http://localhost:8000"
+
+echo "⚡ Performance Testing - Multi-Channel Setup"
+echo "==========================================="
+
+# Get channel list
+CHANNELS=($(php artisan tinker --execute="echo implode(' ', array_keys(config('services.discord.channel_mappings')));" 2>/dev/null))
+
+echo "📊 Testing ${#CHANNELS[@]} channels"
+
+# Test each channel with timing
+for CHANNEL in "${CHANNELS[@]}"; do
+    echo -n "Testing $CHANNEL: "
+
+    START_TIME=$(date +%s%N)
+
+    RESPONSE=$(curl -s -X POST "$BASE_URL/api/discord/simulate" \
+      -H "Content-Type: application/json" \
+      -H "X-API-Key: $API_KEY" \
+      -d "{
+        \"content\": \"Performance test $(date +%s)\",
+        \"username\": \"PerfTest\",
+        \"channel_id\": \"$CHANNEL\"
+      }")
+
+    END_TIME=$(date +%s%N)
+    DURATION=$(( (END_TIME - START_TIME) / 1000000 ))  # Convert to milliseconds
+
+    if echo "$RESPONSE" | grep -q "success"; then
+        echo "✅ ${DURATION}ms"
+    else
+        echo "❌ FAILED (${DURATION}ms)"
+    fi
+
+    sleep 1  # Rate limiting
+done
+
+echo "==========================================="
+echo "✅ Performance testing complete"
+```
+
+### Scaling Considerations
+
+#### Performance Guidelines
+
+- **✅ Recommended**: Up to 10-15 channels for optimal performance
+- **⚠️ Tested Maximum**: 25 channels (performance may degrade beyond this)
+- **🧠 Memory Usage**: Each additional channel adds ~2-5MB memory usage
+- **⏱️ Processing Time**: Linear increase with channel count
+- **🔄 WebSocket Limits**: Discord allows 1000 events per session
+
+#### Resource Monitoring
+
+```bash
+# Monitor bot memory usage and CPU
+ps -p $(pgrep -f "discord:start") -o pid,pcpu,pmem,time,args
+
+# Check Laravel server performance
+curl -w "@curl-format.txt" -X GET http://localhost:8000/api/status \
+  -H "X-API-Key: your_api_secret_here"
+
+# Monitor message processing rate
+tail -f backend/laravel-server/storage/logs/laravel.log | grep "Message sent to ClickUp" | wc -l
+```
+
+#### Production Scaling Tips
+
+1. **Use Process Monitoring**: Implement supervisor or PM2 for auto-restart
+2. **Database Optimization**: Consider MySQL/PostgreSQL for >20 channels
+3. **Queue System**: Implement Laravel queues for high message volumes
+4. **Caching**: Enable Redis/Memcached for configuration caching
+5. **Load Balancing**: Use multiple bot instances with different channel sets
+
+#### High-Volume Setup (20+ Channels)
+
+```php
+// Example: Enterprise setup with 30+ channels
+'channel_mappings' => [
+    // Region 1: North America
+    '1111111111111111111' => '6-901209555111-1',        // NA_CRITICAL
+    '1111111111111111112' => '6-901209555112-2',        // NA_INCIDENTS
+    '1111111111111111113' => '6-901209555113-3',        // NA_SUPPORT
+
+    // Region 2: Europe
+    '2222222222222222221' => '6-901209555221-1',        // EU_CRITICAL
+    '2222222222222222222' => '6-901209555222-2',        // EU_INCIDENTS
+    '2222222222222222223' => '6-901209555223-3',        // EU_SUPPORT
+
+    // Region 3: Asia Pacific
+    '3333333333333333331' => '6-901209555331-1',        // APAC_CRITICAL
+    '3333333333333333332' => '6-901209555332-2',        // APAC_INCIDENTS
+    '3333333333333333333' => '6-901209555333-3',        // APAC_SUPPORT
+
+    // Department Channels
+    '4444444444444444441' => '6-901209555441-1',        // ENGINEERING
+    '4444444444444444442' => '6-901209555442-2',        // DEVOPS
+    '4444444444444444443' => '6-901209555443-3',        // SECURITY
+    '4444444444444444444' => '6-901209555444-4',        // QA_TESTING
+
+    // Priority Levels
+    '5555555555555555551' => '6-901209555551-1',        // P1_CRITICAL
+    '5555555555555555552' => '6-901209555552-2',        // P2_HIGH
+    '5555555555555555553' => '6-901209555553-3',        // P3_MEDIUM
+    '5555555555555555554' => '6-901209555554-4',        // P4_LOW
+
+    // Business Units
+    '6666666666666666661' => '6-901209555661-1',        // SALES_ALERTS
+    '6666666666666666662' => '6-901209555662-2',        // MARKETING_EVENTS
+    '6666666666666666663' => '6-901209555663-3',        // HR_NOTIFICATIONS
+    '6666666666666666664' => '6-901209555664-4',        // FINANCE_REPORTS
+],
+```
+
+### Security Considerations
+
+1. **Channel IDs are Public**: Discord channel IDs are not secrets, safe to store in config
+2. **ClickUp Channel IDs**: Also public within your workspace, safe to store in config
+3. **Access Control**: Ensure Discord bot only has access to intended channels
+4. **ClickUp Permissions**: Verify bot user has appropriate ClickUp channel permissions
+5. **Configuration Management**: Keep services.php in version control for team collaboration
+6. **Environment Separation**: Use different channel mappings for dev/staging/production
+
+### Multi-Channel Monitoring & Maintenance
+
+#### Real-Time Monitoring Commands
+
+```bash
+# Monitor all channels simultaneously
+tail -f backend/laravel-server/storage/logs/laravel.log | grep -E "Channel:|Message sent to ClickUp|Error"
+
+# Check channel-specific activity
+tail -f backend/laravel-server/storage/logs/laravel.log | grep "1087467843584532510"
+
+# Monitor message processing rate per channel
+tail -f backend/laravel-server/storage/logs/laravel.log | grep "Message sent to ClickUp" | awk '{print $NF}' | sort | uniq -c
+
+# Check for failed message deliveries
+curl -X GET http://localhost:8000/api/messages/failed \
+  -H "X-API-Key: your_api_secret_here"
+```
+
+#### Health Check Script
+
+Create a monitoring script for production environments:
+
+```bash
+#!/bin/bash
+# File: monitor-bot.sh
+
+API_KEY="your_api_secret_here"
+BASE_URL="http://localhost:8000"
+
+echo "🔍 Discord Bot Health Check - $(date)"
+echo "=================================="
+
+# Check bot status
+STATUS=$(curl -s -X GET "$BASE_URL/api/status" -H "X-API-Key: $API_KEY" | jq -r '.discord_bot.status')
+if [ "$STATUS" = "connected" ]; then
+    echo "✅ Discord Bot: Connected"
+else
+    echo "❌ Discord Bot: Disconnected"
+fi
+
+# Check ClickUp authentication
+CLICKUP_STATUS=$(curl -s -X GET "$BASE_URL/api/auth/clickup/status" -H "X-API-Key: $API_KEY" | jq -r '.authenticated')
+if [ "$CLICKUP_STATUS" = "true" ]; then
+    echo "✅ ClickUp: Authenticated"
+else
+    echo "❌ ClickUp: Authentication Failed"
+fi
+
+# Check recent message count
+MESSAGE_COUNT=$(curl -s -X GET "$BASE_URL/api/messages" -H "X-API-Key: $API_KEY" | jq '. | length')
+echo "📊 Recent Messages: $MESSAGE_COUNT"
+
+# Check for failed messages
+FAILED_COUNT=$(curl -s -X GET "$BASE_URL/api/messages/failed" -H "X-API-Key: $API_KEY" | jq '. | length')
+if [ "$FAILED_COUNT" -gt 0 ]; then
+    echo "⚠️ Failed Messages: $FAILED_COUNT"
+else
+    echo "✅ Failed Messages: 0"
+fi
+
+echo "=================================="
+```
+
+#### Channel Performance Analytics
+
+```bash
+# Analyze message volume per channel (last 24 hours)
+grep "Message sent to ClickUp" backend/laravel-server/storage/logs/laravel.log | \
+  grep "$(date +%Y-%m-%d)" | \
+  awk '{print $NF}' | \
+  sort | uniq -c | \
+  sort -nr
+
+# Check response times per channel
+grep "Processing time:" backend/laravel-server/storage/logs/laravel.log | \
+  tail -20
+
+# Monitor memory usage over time
+while true; do
+  echo "$(date): $(ps -p $(pgrep -f 'discord:start') -o pmem= | tr -d ' ')% memory"
+  sleep 300  # Check every 5 minutes
+done
+```
+
+#### Automated Channel Testing
+
+```bash
+#!/bin/bash
+# File: test-all-channels.sh
+
+API_KEY="your_api_secret_here"
+BASE_URL="http://localhost:8000"
+
+# Read channel mappings from config
+CHANNELS=(
+    "1087467843584532510"  # INCIDENTS
+    "1087466485498265722"  # WEBCAR_INCIDENTS
+    # Add all your channels here
+)
+
+echo "🧪 Testing All Channels - $(date)"
+echo "================================"
+
+for CHANNEL in "${CHANNELS[@]}"; do
+    echo "Testing channel: $CHANNEL"
+
+    RESPONSE=$(curl -s -X POST "$BASE_URL/api/discord/simulate" \
+      -H "Content-Type: application/json" \
+      -H "X-API-Key: $API_KEY" \
+      -d "{
+        \"content\": \"Test message from monitoring script - $(date)\",
+        \"username\": \"MonitorBot\",
+        \"channel_id\": \"$CHANNEL\"
+      }")
+
+    if echo "$RESPONSE" | grep -q "success"; then
+        echo "✅ Channel $CHANNEL: OK"
+    else
+        echo "❌ Channel $CHANNEL: FAILED"
+        echo "   Response: $RESPONSE"
+    fi
+
+    sleep 2  # Rate limiting
+done
+
+echo "================================"
+echo "✅ Channel testing complete"
+```
+
+---
+
+**🎯 Result**: After following this guide, your bot will monitor multiple Discord channels simultaneously and route messages to their corresponding ClickUp channels automatically.
+
+### 📋 Quick Reference Commands
+
+#### Essential Multi-Channel Commands
+
+```bash
+# Add new channel mapping
+nano backend/laravel-server/config/services.php
+# Add: 'DISCORD_ID' => 'CLICKUP_ID',
+
+# Restart bot with new channels
+pkill -f "discord:start" && php artisan discord:start
+
+# Test new channel
+curl -X POST http://localhost:8000/api/discord/simulate \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your_api_secret_here" \
+  -d '{"content": "Test", "username": "Test", "channel_id": "NEW_CHANNEL_ID"}'
+
+# Monitor all channels
+tail -f backend/laravel-server/storage/logs/laravel.log | grep -E "Channel|ClickUp"
+
+# Check configuration
+php artisan tinker --execute="dd(config('services.discord.channel_mappings'));"
+```
+
+#### One-Line Status Checks
+
+```bash
+# Bot status
+curl -s -X GET http://localhost:8000/api/status -H "X-API-Key: your_api_secret_here" | jq '.discord_bot.status'
+
+# Channel count
+php artisan tinker --execute="echo count(config('services.discord.channel_mappings'));"
+
+# Recent messages
+curl -s -X GET http://localhost:8000/api/messages -H "X-API-Key: your_api_secret_here" | jq '. | length'
+
+# Failed messages
+curl -s -X GET http://localhost:8000/api/messages/failed -H "X-API-Key: your_api_secret_here" | jq '. | length'
+```
+
+### 🎯 Multi-Channel Best Practices Summary
+
+#### ✅ Do's
+
+1. **📝 Document Channel Purpose**: Use clear comments in config/services.php
+2. **🧪 Test Each Channel**: Verify every new channel mapping works
+3. **📊 Monitor Performance**: Check memory usage with 10+ channels
+4. **🔄 Restart After Changes**: Always restart bot after config changes
+5. **📈 Use Meaningful Names**: Comment channel mappings with their purpose
+6. **🔐 Verify Permissions**: Ensure bot has access to all channels
+7. **📋 Keep Logs**: Monitor laravel.log for issues
+8. **🔄 Version Control**: Keep services.php in git for team collaboration
+
+#### ❌ Don'ts
+
+1. **🚫 No Duplicate Mappings**: One Discord channel → One ClickUp channel
+2. **🚫 No Hardcoded IDs**: Keep all channel IDs in config/services.php
+3. **🚫 No .env Channel IDs**: Only secrets go in .env
+4. **🚫 No Syntax Errors**: Always validate PHP syntax
+5. **🚫 No Production Testing**: Test changes in development first
+6. **🚫 No Missing Permissions**: Verify bot access to all channels
+7. **🚫 No Unmonitored Changes**: Always check logs after modifications
+8. **🚫 No Unlimited Scaling**: Monitor performance beyond 15 channels
+
+### 🎉 Success Indicators
+
+When your multi-channel setup is working correctly, you'll see:
+
+```bash
+# Bot startup logs
+🚀 Starting Discord bot...
+👀 Watching channels: 1087467843584532510, 1087466485498265722, 1234567890123456789
+📨 ClickUp channels: 6-901209555432-8, 6-901209555434-8, 6-901209555999-9
+✅ Discord bot is ready!
+
+# Message forwarding logs
+📨 Message received from channel 1087467843584532510
+📤 Message sent to ClickUp channel 6-901209555432-8
+✅ Message delivery confirmed
+```
+
+### 📞 Support Checklist
+
+Before seeking help, verify:
+
+- [ ] PHP syntax is valid: `php -l config/services.php`
+- [ ] Bot is running: `ps aux | grep "discord:start"`
+- [ ] Configuration loads: `php artisan tinker --execute="dd(config('services.discord.channel_mappings'));"`
+- [ ] All channels tested: Test each mapping individually
+- [ ] Logs checked: `tail -f storage/logs/laravel.log`
+- [ ] Permissions verified: Bot has access to all Discord and ClickUp channels
+- [ ] API working: `curl -X GET http://localhost:8000/api/status`
+
+**🎯 With this comprehensive guide, you can confidently set up and manage multiple Discord-to-ClickUp channel mappings for any scale of operation!**
 
 ## 🤖 Discord Bot Commands
 
 ### Start the Discord Bot
+
 ```bash
 cd backend/laravel-server
 php artisan discord:start
 ```
 
 ### Check Bot Status
+
 ```bash
 curl -X GET http://localhost:8000/api/status \
   -H "X-API-Key: your_api_secret_here"
 ```
 
 ### View Recent Messages
+
 ```bash
 curl -X GET http://localhost:8000/api/messages \
   -H "X-API-Key: your_api_secret_here"
@@ -115,6 +916,7 @@ curl -X GET http://localhost:8000/api/messages \
 ## 📡 API Endpoints
 
 ### � Laravel Backend (Port 8000)
+
 ```http
 # Health & Status
 GET  /api/health                    # Health check
@@ -150,18 +952,21 @@ curl -X GET http://localhost:8000/api/status \
 ## 🧪 Testing the System
 
 ### 1. Start the Backend Server
+
 ```bash
 cd backend/laravel-server
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
 ### 2. Start the Discord Bot
+
 ```bash
 cd backend/laravel-server
 php artisan discord:start
 ```
 
 ### 3. Test Message Simulation
+
 ```bash
 curl -X POST http://localhost:8000/api/discord/simulate \
   -H "Content-Type: application/json" \
@@ -174,6 +979,7 @@ curl -X POST http://localhost:8000/api/discord/simulate \
 ```
 
 ### 4. Check ClickUp
+
 - Visit your ClickUp workspace
 - Navigate to the configured chat channel
 - Verify the message appeared with proper formatting
@@ -191,6 +997,7 @@ curl -X POST http://localhost:8000/api/discord/simulate \
 ## 🛠️ Development Commands
 
 ### Laravel Backend
+
 ```bash
 # Server Management
 php artisan serve --host=0.0.0.0 --port=8000  # Start web server
@@ -208,6 +1015,7 @@ php artisan route:cache                         # Cache routes
 ```
 
 ### Vue.js Frontend
+
 ```bash
 npm run dev             # Development server
 npm run build           # Production build
@@ -217,6 +1025,7 @@ npm run lint            # Code linting
 ## 🔍 Monitoring & Logging
 
 ### Real-time Monitoring
+
 ```bash
 # Follow Laravel logs
 tail -f backend/laravel-server/storage/logs/laravel.log
@@ -231,6 +1040,7 @@ curl -X GET http://localhost:8000/api/messages \
 ```
 
 ### Log Files
+
 - **Laravel Logs**: `backend/laravel-server/storage/logs/laravel.log`
 - **Discord Bot**: Real-time console output
 - **Database**: Complete message and status history
@@ -238,6 +1048,7 @@ curl -X GET http://localhost:8000/api/messages \
 ## 🚢 Production Deployment
 
 ### Laravel Backend
+
 ```bash
 # Environment setup
 cp .env.example .env
@@ -254,6 +1065,7 @@ php artisan discord:start  # In separate terminal/process
 ```
 
 ### Using Process Manager
+
 ```bash
 # Install supervisor or PM2
 sudo apt-get install supervisor
@@ -273,6 +1085,7 @@ autorestart=true
 ## 🎯 Technology Stack
 
 ### 🚀 Backend (PHP-Only)
+
 - **PHP 8.3+** with **Laravel 10.x**
 - **team-reflex/discord-php** for Discord WebSocket connection
 - **SQLite** database for message persistence
@@ -280,6 +1093,7 @@ autorestart=true
 - **Real-time message processing**
 
 ### 🎨 Frontend (Optional)
+
 - **Vue.js 3** with **Vite** for management interface
 - **Real-time monitoring** of bot status
 - **Message history** and **error tracking**
@@ -297,15 +1111,15 @@ autorestart=true
 
 ## 📊 Performance Metrics
 
-| Metric | Current System |
-|--------|----------------|
-| **Startup Time** | ~3 seconds |
-| **Memory Usage** | ~85MB |
-| **Message Processing** | <200ms |
-| **Database Queries** | Optimized with Eloquent |
-| **Discord Connection** | WebSocket with auto-reconnect |
-| **ClickUp Delivery** | <100ms per message |
-| **Concurrent Messages** | 500+ per minute |
+| Metric                  | Current System                |
+| ----------------------- | ----------------------------- |
+| **Startup Time**        | ~3 seconds                    |
+| **Memory Usage**        | ~85MB                         |
+| **Message Processing**  | <200ms                        |
+| **Database Queries**    | Optimized with Eloquent       |
+| **Discord Connection**  | WebSocket with auto-reconnect |
+| **ClickUp Delivery**    | <100ms per message            |
+| **Concurrent Messages** | 500+ per minute               |
 
 ## 🤝 Contributing
 
@@ -326,6 +1140,7 @@ autorestart=true
 ### Common Issues
 
 #### Discord Bot Issues
+
 ```bash
 # Bot appears offline
 # Check if Discord bot is running
@@ -344,6 +1159,7 @@ curl -X GET http://localhost:8000/api/status \
 ```
 
 #### Database Issues
+
 ```bash
 # Duplicate message errors
 # The bot now handles duplicates automatically
@@ -355,6 +1171,7 @@ php artisan migrate
 ```
 
 #### ClickUp Integration Issues
+
 ```bash
 # Re-authenticate with ClickUp
 curl -X DELETE http://localhost:8000/api/auth/clickup/revoke \
@@ -366,6 +1183,7 @@ curl -X GET http://localhost:8000/api/auth/clickup/status \
 ```
 
 #### Laravel Server Issues
+
 ```bash
 # Permission errors
 chmod -R 755 storage bootstrap/cache
@@ -378,6 +1196,7 @@ php artisan migrate:status
 ```
 
 #### Frontend Issues
+
 ```bash
 # Development server issues
 rm -rf node_modules && npm install
@@ -389,17 +1208,18 @@ npm run build
 
 ### Error Messages & Solutions
 
-| Error | Solution |
-|-------|----------|
+| Error                                                           | Solution                                                |
+| --------------------------------------------------------------- | ------------------------------------------------------- |
 | `UNIQUE constraint failed: discord_messages.discord_message_id` | ✅ **Fixed** - Bot now handles duplicates automatically |
-| `Bot appears offline in Discord` | Check bot process with `ps aux \| grep discord:start` |
-| `ClickUp authentication failed` | Re-authenticate via `/api/auth/clickup` |
-| `Port already in use` | Kill process: `lsof -ti:8000 \| xargs kill -9` |
-| `Database locked` | Restart Laravel server |
+| `Bot appears offline in Discord`                                | Check bot process with `ps aux \| grep discord:start`   |
+| `ClickUp authentication failed`                                 | Re-authenticate via `/api/auth/clickup`                 |
+| `Port already in use`                                           | Kill process: `lsof -ti:8000 \| xargs kill -9`          |
+| `Database locked`                                               | Restart Laravel server                                  |
 
 ## 📞 Support & Maintenance
 
 ### 🔍 System Status Check
+
 ```bash
 # Check Discord bot process
 ps aux | grep "php artisan discord:start"
@@ -418,6 +1238,7 @@ curl -X GET http://localhost:8000/api/messages \
 ```
 
 ### 📋 Log Monitoring
+
 ```bash
 # Discord bot activity
 tail -f storage/logs/laravel.log | grep -E "Discord|ClickUp|Message"
@@ -430,6 +1251,7 @@ tail -f storage/logs/laravel.log | grep -i error
 ```
 
 ### 🔄 Restart Services
+
 ```bash
 # Restart Discord bot
 pkill -f "php artisan discord:start"
@@ -443,6 +1265,7 @@ ps aux | grep -E "php|artisan"
 ```
 
 ### 🎯 Test Message Flow
+
 ```bash
 # Test with simulation
 curl -X POST http://localhost:8000/api/discord/simulate \
@@ -456,6 +1279,7 @@ curl -X POST http://localhost:8000/api/discord/simulate \
 ```
 
 ### 🚨 Emergency Procedures
+
 ```bash
 # Stop all services
 pkill -f "php artisan"
@@ -498,6 +1322,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **🚀 Your Discord-to-ClickUp integration is ready! Send a message in Discord channel `1087467843584532510` and watch it appear in ClickUp chat channel `6-901209555432-8`!**
 
 ### 🎯 Current Operational Status
+
 - **Discord Bot**: ✅ Connected and monitoring (Pure PHP)
 - **Message Processing**: ✅ Real-time with duplicate handling
 - **ClickUp Integration**: ✅ Messages forwarded successfully

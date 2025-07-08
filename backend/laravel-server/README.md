@@ -15,12 +15,14 @@ This is a Laravel-based implementation of the Discord to ClickUp bot that provid
 ## Installation
 
 1. **Install Dependencies**
+
    ```bash
    cd laravel-server
    composer install
    ```
 
 2. **Environment Setup**
+
    ```bash
    cp .env.example .env
    php artisan key:generate
@@ -28,6 +30,7 @@ This is a Laravel-based implementation of the Discord to ClickUp bot that provid
 
 3. **Configure Environment Variables**
    Update your `.env` file with your Discord and ClickUp credentials:
+
    ```env
    API_SECRET=your_api_secret_here
    DISCORD_BOT_TOKEN=your_discord_bot_token
@@ -39,6 +42,7 @@ This is a Laravel-based implementation of the Discord to ClickUp bot that provid
    ```
 
 4. **Database Setup**
+
    ```bash
    php artisan migrate
    ```
@@ -51,27 +55,32 @@ This is a Laravel-based implementation of the Discord to ClickUp bot that provid
 ## API Endpoints
 
 ### Bot Control
+
 - `GET /api/status` - Get bot and ClickUp authentication status
 - `POST /api/bot/start` - Start the Discord bot (simulated)
 - `POST /api/bot/stop` - Stop the Discord bot (simulated)
 - `GET /api/messages` - Get recent Discord messages
 
 ### ClickUp Authentication
+
 - `GET /api/auth/clickup` - Redirect to ClickUp OAuth
 - `GET /api/auth/clickup/callback` - Handle OAuth callback
 - `GET /api/auth/clickup/status` - Get authentication status
 - `DELETE /api/auth/clickup/revoke` - Revoke ClickUp token
 
 ### Discord Integration
+
 - `POST /api/discord/webhook` - Handle Discord webhooks (no API key required)
 - `POST /api/discord/simulate` - Simulate Discord message for testing
 
 ### Utility
+
 - `GET /api/health` - Health check endpoint
 
 ## Authentication
 
 Most endpoints require an API key passed via:
+
 - Header: `X-API-Key: your_api_secret`
 - Query parameter: `?api_key=your_api_secret`
 - Body parameter: `api_key: your_api_secret`
@@ -93,12 +102,15 @@ PUSHER_APP_CLUSTER=your_cluster
 Since Laravel is a PHP framework and doesn't have native Discord.js support, there are several approaches to integrate with Discord:
 
 ### 1. Webhooks (Recommended)
+
 Configure Discord webhooks to send messages to `/api/discord/webhook`
 
 ### 2. External Bot Process
+
 Run a separate Discord bot process that communicates with the Laravel API
 
 ### 3. Scheduled API Polling
+
 Use Laravel's scheduler to poll Discord's API for new messages
 
 ## Artisan Commands

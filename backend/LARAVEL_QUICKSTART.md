@@ -3,22 +3,26 @@
 🚀 **Getting Started**
 
 1. **Navigate to the Laravel server directory:**
+
    ```bash
    cd backend/laravel-server
    ```
 
 2. **Run the installation script:**
+
    ```bash
    ./install.sh
    ```
 
 3. **Configure your environment:**
    Edit the `.env` file with your Discord and ClickUp credentials:
+
    ```bash
    nano .env
    ```
 
 4. **Start the server:**
+
    ```bash
    php artisan serve --host=0.0.0.0 --port=8000
    ```
@@ -29,6 +33,7 @@
 ## 🔧 **Configuration**
 
 ### Required Environment Variables:
+
 - `API_SECRET` - Your API secret key
 - `DISCORD_BOT_TOKEN` - Your Discord bot token
 - `CLICKUP_CLIENT_ID` - Your ClickUp app client ID
@@ -38,6 +43,7 @@
 - `WATCHED_CHANNEL_IDS` - Discord channel IDs to monitor (comma-separated)
 
 ### Optional (for real-time updates):
+
 - `PUSHER_APP_ID` - Pusher app ID
 - `PUSHER_APP_KEY` - Pusher app key
 - `PUSHER_APP_SECRET` - Pusher app secret
@@ -65,6 +71,7 @@ php artisan route:clear   # Clear route cache
 ## 🔗 **API Endpoints**
 
 All endpoints require API key authentication (except webhooks):
+
 - Header: `X-API-Key: your_api_secret`
 - Query: `?api_key=your_api_secret`
 - Body: `api_key: your_api_secret`
@@ -74,16 +81,19 @@ Visit http://localhost:8000 for complete API documentation.
 ## 🐛 **Troubleshooting**
 
 1. **Permission errors:**
+
    ```bash
    chmod -R 755 storage bootstrap/cache
    ```
 
 2. **Database errors:**
+
    ```bash
    php artisan migrate:fresh
    ```
 
 3. **Configuration issues:**
+
    ```bash
    php artisan config:clear
    php artisan cache:clear
@@ -100,5 +110,6 @@ Visit http://localhost:8000 for complete API documentation.
 - **Laravel server:** `php artisan serve --port=8000` (runs on port 8000)
 
 Both servers provide similar functionality but use different technologies:
+
 - Node.js: Real-time Discord bot with Socket.IO
 - Laravel: HTTP API with webhook support and database persistence

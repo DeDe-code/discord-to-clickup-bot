@@ -34,8 +34,12 @@ return [
     // Discord Configuration
     'discord' => [
         'bot_token' => env('DISCORD_BOT_TOKEN'),
-        'watched_channel_ids' => env('WATCHED_CHANNEL_IDS'),
         'webhook_secret' => env('DISCORD_WEBHOOK_SECRET'),
+        'channel_mappings' => [
+            // Discord Channel ID => ClickUp Channel ID
+            '1087467843584532510' => '6-901209555432-8',        // INCIDENTS -> INCIDENTS_CLICKUP
+            '1087466485498265722' => '6-901209555434-8',        // WEBCAR_INCIDENTS -> WEBCAR_INCIDENTS_CLICKUP (different channel)
+        ],
     ],
 
     // ClickUp Configuration
@@ -44,8 +48,6 @@ return [
         'client_id' => env('CLICKUP_CLIENT_ID'),
         'client_secret' => env('CLICKUP_CLIENT_SECRET'),
         'workspace_id' => env('CLICKUP_WORKSPACE_ID'),
-        'channel_id' => env('CLICKUP_CHANNEL_ID'),
-        'task_id' => env('CLICKUP_TASK_ID'),
     ],
 
     // Pusher Configuration for Broadcasting

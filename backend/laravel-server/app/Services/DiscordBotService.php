@@ -78,11 +78,14 @@ class DiscordBotService
      */
     public function processDiscordMessage(array $messageData): array
     {
-        $watchedChannelIds = explode(',', config('services.discord.watched_channel_ids', ''));
+        $channelMappings = config('services.discord.channel_mappings', []);
         
-        if (!in_array($messageData['channel_id'], $watchedChannelIds)) {
+        // Check if this Discord channel is in our mapping
+        if (!isset($channelMappings[$messageData['channel_id']])) {
             return ['processed' => false, 'reason' => 'channel_not_watched'];
         }
+        
+        $clickUpChannelId = $channelMappings[$messageData['channel_id']];
 
         $timestamp = date('Y-m-d H:i:s', $messageData['timestamp'] / 1000);
         $author = $messageData['author']['username'] . '#' . $messageData['author']['discriminator'];
@@ -114,9 +117,9 @@ class DiscordBotService
             'discord_timestamp' => date('Y-m-d H:i:s', $messageData['timestamp'] / 1000),
         ]);
 
-        // Send to ClickUp
+        // Send to ClickUp using the mapped channel
         $clickUpService = app(ClickUpService::class);
-        $result = $clickUpService->sendMessage($content);
+        $result = $clickUpService->sendMessage($content, $clickUpChannelId);
 
         if ($result['success']) {
             Log::info('✅ Message sent to ClickUp channel');

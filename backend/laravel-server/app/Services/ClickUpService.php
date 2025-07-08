@@ -123,7 +123,7 @@ class ClickUpService
     /**
      * Send message to ClickUp channel
      */
-    public function sendMessage(string $content): array
+    public function sendMessage(string $content, string $channelId): array
     {
         $token = $this->loadToken();
         
@@ -133,7 +133,6 @@ class ClickUpService
         }
 
         $workspaceId = config('services.clickup.workspace_id');
-        $channelId = config('services.clickup.channel_id');
         $url = "https://api.clickup.com/api/v3/workspaces/{$workspaceId}/chat/channels/{$channelId}/messages";
 
         try {

@@ -45,20 +45,21 @@ class DiscordBotStart extends Command
         );
 
         $token = config('services.discord.bot_token');
-        $watchedChannelIds = explode(',', config('services.discord.watched_channel_ids', ''));
+        $channelMappings = config('services.discord.channel_mappings', []);
         
         if (empty($token)) {
             $this->error('❌ Discord bot token not configured');
             return 1;
         }
 
-        if (empty($watchedChannelIds)) {
-            $this->error('❌ No watched channel IDs configured');
+        if (empty($channelMappings)) {
+            $this->error('❌ No channel mappings configured');
             return 1;
         }
 
         $this->info('🔑 Bot token configured');
-        $this->info('👀 Watching channels: ' . implode(', ', $watchedChannelIds));
+        $this->info('👀 Watching channels: ' . implode(', ', array_keys($channelMappings)));
+        $this->info('📨 ClickUp channels: ' . implode(', ', array_values($channelMappings)));
 
         // Create Discord instance
         $discord = new Discord([
@@ -135,14 +136,14 @@ class DiscordBotStart extends Command
         });
 
         // Message received event
-        $discord->on('message', function (Message $message, Discord $discord) use ($watchedChannelIds) {
+        $discord->on('message', function (Message $message, Discord $discord) use ($channelMappings) {
             // Skip bot messages
             if ($message->author->bot) {
                 return;
             }
 
             // Check if message is from watched channel
-            if (!in_array($message->channel_id, $watchedChannelIds)) {
+            if (!isset($channelMappings[$message->channel_id])) {
                 return;
             }
 
@@ -216,11 +217,21 @@ class DiscordBotStart extends Command
             return;
         }
 
+        // Get the ClickUp channel ID from the mapping
+        $channelMappings = config('services.discord.channel_mappings', []);
+        $clickUpChannelId = $channelMappings[$message->channel_id] ?? null;
+        
+        if (!$clickUpChannelId) {
+            $this->warn('⚠️ No ClickUp channel mapping found for Discord channel: ' . $message->channel_id);
+            Log::warning('No ClickUp channel mapping found for Discord channel: ' . $message->channel_id);
+            return;
+        }
+
         // Format message for ClickUp
         $formattedMessage = $this->formatMessageForClickUp($message);
         
         // Send to ClickUp
-        $result = $clickUpService->sendMessage($formattedMessage);
+        $result = $clickUpService->sendMessage($formattedMessage, $clickUpChannelId);
         
         if ($result['success']) {
             $this->info('✅ Message forwarded to ClickUp successfully!');
