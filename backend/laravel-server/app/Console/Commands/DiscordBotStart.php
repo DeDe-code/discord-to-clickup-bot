@@ -137,8 +137,8 @@ class DiscordBotStart extends Command
 
         // Message received event
         $discord->on('message', function (Message $message, Discord $discord) use ($channelMappings) {
-            // Skip bot messages
-            if ($message->author->bot) {
+            // Skip messages from our own bot to avoid loops
+            if ($message->author->id === $discord->user->id) {
                 return;
             }
 
