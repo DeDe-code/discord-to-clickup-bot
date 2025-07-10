@@ -14,10 +14,19 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    return view('bot-control');
+});
+
+Route::get('/api-docs', function () {
     return response()->json([
         'message' => 'Discord to ClickUp Bot - Laravel Server',
         'version' => '1.0.0',
         'documentation' => [
+            'WebSocket Control' => [
+                'GET /api/websocket/status' => 'Get WebSocket connection status',
+                'POST /api/websocket/connect' => 'Connect to Discord WebSocket',
+                'POST /api/websocket/disconnect' => 'Disconnect from Discord WebSocket',
+            ],
             'Bot Control' => [
                 'GET /api/status' => 'Get bot and ClickUp authentication status',
                 'POST /api/bot/start' => 'Start the Discord bot',

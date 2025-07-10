@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\ClickUpAuthController;
 use App\Http\Controllers\DiscordWebhookController;
+use App\Http\Controllers\WebSocketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,14 @@ Route::post('/bot/stop', [BotController::class, 'stopBot']);
 Route::get('/messages', [BotController::class, 'getMessages']);
 Route::get('/messages/failed', [BotController::class, 'getFailedMessages']);
 Route::post('/messages/retry', [BotController::class, 'retryFailedMessages']);
+
+// WebSocket control routes (no authentication needed for basic status)
+Route::get('/websocket/status', [WebSocketController::class, 'getStatus'])
+    ->withoutMiddleware([\App\Http\Middleware\ApiKeyMiddleware::class]);
+Route::post('/websocket/connect', [WebSocketController::class, 'connect'])
+    ->withoutMiddleware([\App\Http\Middleware\ApiKeyMiddleware::class]);
+Route::post('/websocket/disconnect', [WebSocketController::class, 'disconnect'])
+    ->withoutMiddleware([\App\Http\Middleware\ApiKeyMiddleware::class]);
 
 // ClickUp OAuth routes
 Route::get('/auth/clickup', [ClickUpAuthController::class, 'redirectToClickUp']);
