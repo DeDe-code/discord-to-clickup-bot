@@ -24,6 +24,7 @@ Route::get('/check-new-messages', [BotController::class, 'checkNewMessages']);
 Route::post('/bot/start', [BotController::class, 'startBot']);
 Route::post('/bot/stop', [BotController::class, 'stopBot']);
 Route::get('/messages', [BotController::class, 'getMessages']);
+Route::get('/messages/stats', [BotController::class, 'getStats']);
 Route::get('/messages/failed', [BotController::class, 'getFailedMessages']);
 Route::post('/messages/retry', [BotController::class, 'retryFailedMessages']);
 

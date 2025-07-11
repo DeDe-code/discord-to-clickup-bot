@@ -1,0 +1,275 @@
+[
+    {
+        "id": "1393141281923797112",
+        "discord_message_id": "1393141281923797112",
+        "channel_id": "1087466485498265722",
+        "username": "derzsidezso",
+        "content": "discord bot test message from the webcar incodents channel",
+        "discord_timestamp": "2025-07-11 08:06:04",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "success": true,
+            "response": {
+                "content": "\ud83d\udce8 **Discord Message**\n\n**User**: derzsidezso\n**Time**: 1970-01-01 00:00:02\n**Channel**: <#1087466485498265722>\n**Message**: discord bot test message from the webcar incodents channel\n\ud83d\udd17 [View in Discord](https:\/\/discord.com\/channels\/999641578509451324\/1087466485498265722\/1393141281923797112)\n",
+                "date": 1752221165397,
+                "id": 80120011891545,
+                "parent_channel": "6-901209555434-8",
+                "replies_count": 0,
+                "resolved": false,
+                "user_id": "81802815",
+                "links": {
+                    "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011891545\/reactions",
+                    "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011891545\/replies",
+                    "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011891545\/tagged_users"
+                }
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T08:06:05.024445Z",
+        "updated_at": "2025-07-11T08:06:05.673109Z"
+    },
+    {
+        "id": "1752219631348",
+        "discord_message_id": "1752219631348",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo8",
+        "content": "Test message 8 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:31",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo8#0001\n**Time**: 2025-07-11 07:40:31\n**Message**: Test message 8 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219631348)\n",
+            "date": 1752219631922,
+            "id": 80120011888273,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888273\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888273\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888273\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:31.123395Z",
+        "updated_at": "2025-07-11T07:40:31.705732Z"
+    },
+    {
+        "id": "1752219630266",
+        "discord_message_id": "1752219630266",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo7",
+        "content": "Test message 7 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:30",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo7#0001\n**Time**: 2025-07-11 07:40:30\n**Message**: Test message 7 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219630266)\n",
+            "date": 1752219630928,
+            "id": 80120011888272,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888272\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888272\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888272\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:30.191945Z",
+        "updated_at": "2025-07-11T07:40:30.575435Z"
+    },
+    {
+        "id": "1752219628104",
+        "discord_message_id": "1752219628104",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo6",
+        "content": "Test message 6 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:28",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo6#0001\n**Time**: 2025-07-11 07:40:28\n**Message**: Test message 6 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219628104)\n",
+            "date": 1752219629747,
+            "id": 80120011888271,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888271\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888271\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888271\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:28.688711Z",
+        "updated_at": "2025-07-11T07:40:29.666707Z"
+    },
+    {
+        "id": "1752219627632",
+        "discord_message_id": "1752219627632",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo5",
+        "content": "Test message 5 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:27",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo5#0001\n**Time**: 2025-07-11 07:40:27\n**Message**: Test message 5 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219627632)\n",
+            "date": 1752219628394,
+            "id": 80120011888268,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888268\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888268\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888268\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:27.646729Z",
+        "updated_at": "2025-07-11T07:40:28.169681Z"
+    },
+    {
+        "id": "1752219626875",
+        "discord_message_id": "1752219626875",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo4",
+        "content": "Test message 4 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:26",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo4#0001\n**Time**: 2025-07-11 07:40:26\n**Message**: Test message 4 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219626875)\n",
+            "date": 1752219627403,
+            "id": 80120011888262,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888262\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888262\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888262\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:26.617432Z",
+        "updated_at": "2025-07-11T07:40:27.100340Z"
+    },
+    {
+        "id": "1752219625922",
+        "discord_message_id": "1752219625922",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo3",
+        "content": "Test message 3 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:25",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo3#0001\n**Time**: 2025-07-11 07:40:25\n**Message**: Test message 3 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219625922)\n",
+            "date": 1752219626398,
+            "id": 80120011888260,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888260\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888260\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888260\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:25.672995Z",
+        "updated_at": "2025-07-11T07:40:26.094325Z"
+    },
+    {
+        "id": "1752219624240",
+        "discord_message_id": "1752219624240",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo2",
+        "content": "Test message 2 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:24",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo2#0001\n**Time**: 2025-07-11 07:40:24\n**Message**: Test message 2 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219624240)\n",
+            "date": 1752219625424,
+            "id": 80120011888256,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888256\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888256\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888256\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:24.662241Z",
+        "updated_at": "2025-07-11T07:40:25.152292Z"
+    },
+    {
+        "id": "1752219623105",
+        "discord_message_id": "1752219623105",
+        "channel_id": "1087466485498265722",
+        "username": "LimitDemo1",
+        "content": "Test message 1 for limit demo",
+        "discord_timestamp": "2025-07-11 07:40:23",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitDemo1#0001\n**Time**: 2025-07-11 07:40:23\n**Message**: Test message 1 for limit demo\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219623105)\n",
+            "date": 1752219624385,
+            "id": 80120011888255,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888255\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888255\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888255\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:40:23.440255Z",
+        "updated_at": "2025-07-11T07:40:24.127193Z"
+    },
+    {
+        "id": "1752219569589",
+        "discord_message_id": "1752219569589",
+        "channel_id": "1087466485498265722",
+        "username": "LimitTest",
+        "content": "Testing 10-message limit",
+        "discord_timestamp": "2025-07-11 07:39:29",
+        "clickup_sent": true,
+        "clickup_channel_id": "6-901209555434-8",
+        "clickup_response": {
+            "content": "\ud83d\udce8 **New Discord Message**\n\n**User**: LimitTest#0001\n**Time**: 2025-07-11 07:39:29\n**Message**: Testing 10-message limit\n\ud83d\udd17 [View message in Discord](https:\/\/discord.com\/channels\/987654321\/1087466485498265722\/1752219569589)\n",
+            "date": 1752219570430,
+            "id": 80120011888181,
+            "parent_channel": "6-901209555434-8",
+            "replies_count": 0,
+            "resolved": false,
+            "user_id": "81802815",
+            "links": {
+                "reactions": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888181\/reactions",
+                "replies": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888181\/replies",
+                "tagged_users": "\/api\/v3\/workspaces\/2461527\/chat\/messages\/80120011888181\/tagged_users"
+            }
+        },
+        "error_message": null,
+        "created_at": "2025-07-11T07:39:29.592835Z",
+        "updated_at": "2025-07-11T07:39:30.254339Z"
+    }
+]

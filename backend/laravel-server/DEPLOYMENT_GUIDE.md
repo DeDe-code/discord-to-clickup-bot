@@ -1,26 +1,26 @@
-# Discord to ClickUp Bot - Egyszerűsített Web-alapú Verzió
+# Discord to ClickUp Bot - Simplified Web-based Version
 
-## Áttekintés
+## Overview
 
-Ez egy egyszerűsített megoldás a Discord-ClickUp bot kezelésére webes felületen keresztül. A bot WebSocket kapcsolatot használ a Discord Gateway-jel, és minden beérkező üzenetet közvetlenül továbbít a ClickUp-nak.
+This is a simplified solution for managing the Discord-ClickUp bot through a web interface. The bot uses WebSocket connection with the Discord Gateway and forwards all incoming messages directly to ClickUp.
 
-## Főbb jellemzők
+## Key Features
 
-- **Webes felület**: A bot állapotának megtekintése és vezérlése webböngészőből
-- **WebSocket kapcsolat**: Valós idejű Discord üzenetfigyelés
-- **Egyszerű telepítés**: Nincs szükség CLI hozzáférésre
-- **Cache-alapú állapot**: A bot állapota cache-ben tárolódik (nincs adatbázis)
-- **Háttér feldolgozás**: A WebSocket kapcsolat háttérben fut
+- **Web Interface**: View and control bot status from a web browser
+- **WebSocket Connection**: Real-time Discord message monitoring
+- **Simple Installation**: No CLI access required
+- **Cache-based State**: Bot status stored in cache (no database)
+- **Background Processing**: WebSocket connection runs in the background
 
-## Telepítés
+## Installation
 
-### 1. Fájlok feltöltése
+### 1. Upload Files
 
-Töltse fel a `backend/laravel-server` mappát a hosting szolgáltatóra.
+Upload the `backend/laravel-server` folder to your hosting provider.
 
-### 2. Környezeti változók beállítása
+### 2. Environment Variables Setup
 
-Szerkessze a `.env` fájlt:
+Edit the `.env` file:
 
 ```env
 APP_NAME="Discord to ClickUp Bot"
@@ -47,138 +47,138 @@ SESSION_DRIVER=file
 QUEUE_CONNECTION=sync
 ```
 
-### 3. Függőségek telepítése
+### 3. Dependencies Installation
 
-Ha van composer hozzáférés:
+If you have composer access:
 
 ```bash
 composer install --no-dev --optimize-autoloader
 ```
 
-### 4. Jogosultságok beállítása
+### 4. Permissions Setup
 
-Győződjön meg róla, hogy a következő mappák írhatók:
+Make sure the following folders are writable:
 
 - `storage/`
 - `bootstrap/cache/`
 
-## Használat
+## Usage
 
-### Webes felület elérése
+### Web Interface Access
 
-Nyissa meg a weboldalt a böngészőben: `http://your-domain.com`
+Open the website in your browser: `http://your-domain.com`
 
-### Bot vezérlés
+### Bot Control
 
-1. **Állapot megtekintése**: A főoldalon látható a WebSocket kapcsolat állapota
-2. **Kapcsolódás**: Kattintson a "Connect" gombra a Discord Gateway-hez való csatlakozáshoz
-3. **Lekapcsolás**: Kattintson a "Disconnect" gombra a kapcsolat bontásához
-4. **Frissítés**: A "Refresh" gombbal frissítheti az állapotot
+1. **View Status**: The main page shows the WebSocket connection status
+2. **Connect**: Click the "Connect" button to connect to the Discord Gateway
+3. **Disconnect**: Click the "Disconnect" button to close the connection
+4. **Refresh**: Use the "Refresh" button to update the status
 
-### Üzenetkezelés
+### Message Handling
 
-A bot automatikusan:
+The bot automatically:
 
-- Figyeli a beállított Discord csatornákat
-- Továbbítja az összes üzenetet (beleértve a bot üzeneteket is) a ClickUp-nak
-- Naplózza az eseményeket
+- Monitors configured Discord channels
+- Forwards all messages (including bot messages) to ClickUp
+- Logs events
 
-## API Végpontok
+## API Endpoints
 
-### WebSocket vezérlés
+### WebSocket Control
 
-- `GET /api/websocket/status` - WebSocket kapcsolat állapota
-- `POST /api/websocket/connect` - Csatlakozás a Discord Gateway-hez
-- `POST /api/websocket/disconnect` - Lekapcsolás a Discord Gateway-ről
+- `GET /api/websocket/status` - WebSocket connection status
+- `POST /api/websocket/connect` - Connect to Discord Gateway
+- `POST /api/websocket/disconnect` - Disconnect from Discord Gateway
 
-### ClickUp hitelesítés
+### ClickUp Authentication
 
-- `GET /api/auth/clickup` - ClickUp OAuth átirányítás
+- `GET /api/auth/clickup` - ClickUp OAuth redirect
 - `GET /api/auth/clickup/callback` - ClickUp OAuth callback
-- `GET /api/auth/clickup/status` - ClickUp hitelesítés állapota
+- `GET /api/auth/clickup/status` - ClickUp authentication status
 
-## Technikai részletek
+## Technical Details
 
-### Fájlstruktúra
+### File Structure
 
 ```
 backend/laravel-server/
 ├── app/
 │   ├── Console/Commands/
-│   │   └── WebSocketConnect.php          # Háttér WebSocket kapcsolat
+│   │   └── WebSocketConnect.php          # Background WebSocket connection
 │   ├── Http/Controllers/
-│   │   └── WebSocketController.php       # Web API vezérlő
+│   │   └── WebSocketController.php       # Web API controller
 │   └── Services/
-│       └── DiscordBotService.php         # Discord üzenetfeldolgozás
+│       └── DiscordBotService.php         # Discord message processing
 ├── resources/views/
-│   └── bot-control.blade.php             # Webes felület
+│   └── bot-control.blade.php             # Web interface
 ├── routes/
-│   ├── web.php                           # Web útvonalak
-│   └── api.php                           # API útvonalak
-└── .env                                  # Konfigurációs fájl
+│   ├── web.php                           # Web routes
+│   └── api.php                           # API routes
+└── .env                                  # Configuration file
 ```
 
-### Cache használata
+### Cache Usage
 
-A bot állapota cache-ben tárolódik:
+Bot status is stored in cache:
 
-- `discord_websocket_status` - WebSocket kapcsolat állapota
-- TTL: 3600 másodperc (1 óra)
+- `discord_websocket_status` - WebSocket connection status
+- TTL: 3600 seconds (1 hour)
 
-### Háttér folyamatok
+### Background Processes
 
-A WebSocket kapcsolat háttérben fut:
+WebSocket connection runs in the background:
 
-- Artisan parancs: `php artisan websocket:connect-background`
-- Folyamat kezelés: `pkill -f 'websocket:connect-background'`
+- Artisan command: `php artisan websocket:connect-background`
+- Process management: `pkill -f 'websocket:connect-background'`
 
-## Hibaelhárítás
+## Troubleshooting
 
-### WebSocket nem csatlakozik
+### WebSocket Won't Connect
 
-1. Ellenőrizze a Discord bot token érvényességét
-2. Ellenőrizze a tűzfal beállításokat
-3. Nézze meg a Laravel log fájlokat (`storage/logs/`)
+1. Check Discord bot token validity
+2. Check firewall settings
+3. Review Laravel log files (`storage/logs/`)
 
-### Üzenetek nem érkeznek meg
+### Messages Not Arriving
 
-1. Ellenőrizze a Discord csatorna ID-kat
-2. Ellenőrizze a bot jogosultságokat a Discord szerverén
-3. Ellenőrizze a ClickUp API beállításokat
+1. Check Discord channel IDs
+2. Check bot permissions on Discord server
+3. Check ClickUp API settings
 
-### Webes felület nem elérhető
+### Web Interface Not Accessible
 
-1. Ellenőrizze a web szerver konfigurációt
-2. Ellenőrizze a fájl jogosultságokat
-3. Ellenőrizze a Laravel útvonal gyorsítótárat
+1. Check web server configuration
+2. Check file permissions
+3. Check Laravel route cache
 
-## Hosting követelmények
+## Hosting Requirements
 
 - PHP 8.1+
-- Composer (telepítéshez)
-- Írható `storage/` és `bootstrap/cache/` mappák
-- Kimenő HTTPS kapcsolat (Discord API)
-- WebSocket támogatás (reaktív PHP könyvtárak)
+- Composer (for installation)
+- Writable `storage/` and `bootstrap/cache/` folders
+- Outbound HTTPS connection (Discord API)
+- WebSocket support (reactive PHP libraries)
 
-## Biztonsági megjegyzések
+## Security Notes
 
-- Az API végpontok védettek (kivéve a WebSocket vezérlés)
-- Az API kulcsokat tartsa biztonságban
-- A Discord bot token-t ne ossza meg
-- Használjon HTTPS-t production környezetben
+- API endpoints are protected (except WebSocket control)
+- Keep API keys secure
+- Do not share Discord bot token
+- Use HTTPS in production environment
 
-## Karbantartás
+## Maintenance
 
-- Rendszeresen ellenőrizze a log fájlokat
-- Monitorizálja a bot állapotát
-- Frissítse a függőségeket szükség szerint
-- Készítsen rendszeres biztonsági mentést
+- Regularly check log files
+- Monitor bot status
+- Update dependencies as needed
+- Make regular security backups
 
-## Támogatás
+## Support
 
-Ha problémába ütközik:
+If you encounter problems:
 
-1. Ellenőrizze a log fájlokat
-2. Ellenőrizze a konfigurációt
-3. Tesztelje a API végpontokat
-4. Ellenőrizze a Discord bot jogosultságokat
+1. Check log files
+2. Verify configuration
+3. Test API endpoints
+4. Check Discord bot permissions

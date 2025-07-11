@@ -13,9 +13,10 @@ This project provides a **streamlined Discord-to-ClickUp integration system** wi
 
 - **🤖 Real-time Discord Bot** - Monitors Discord channels with WebSocket connection
 - **📤 Automatic Message Forwarding** - Sends Discord messages to ClickUp chat channels
-- **🔄 Laravel Backend API** - Robust backend with file-based caching
+- **🔄 Laravel Backend API** - Robust backend with **zero database dependencies**
 - **🎨 Web Interface** - Simple web interface for bot management and monitoring
 - **📊 Comprehensive Logging** - Full message tracking and error handling
+- **📁 File-Based Storage** - All data stored in JSON files, no database required
 
 ## 🏗️ Architecture
 
@@ -40,6 +41,7 @@ discord-to-clickup-bot/
 
 - **PHP** 8.3+ & **Composer**
 - **Discord Bot Token** & **ClickUp API Credentials**
+- **Zero Database Dependencies** - Fully file-based, no MySQL/PostgreSQL required
 
 ### 📦 Laravel Backend Setup
 
@@ -300,7 +302,7 @@ curl -X GET http://localhost:8000/api/status \
 pkill -f "discord:start"
 cd backend/laravel-server && php artisan discord:start
 
-# 2. Verify channel ID format (should be 18-19 digits)
+# 2. Verify channel ID format (should be 19-20 digits)
 echo "1087467843584532510" | wc -c  # Should output 19-20
 
 # 3. Test channel access manually
@@ -987,7 +989,8 @@ curl -X POST http://localhost:8000/api/discord/simulate \
 - **Discord Bot**: Online and connected (`clickup-bot#7655`)
 - **Channel Monitoring**: Watching channel `1087467843584532510`
 - **ClickUp Integration**: Messages forwarded to chat channel
-- **Database**: All messages logged with delivery status
+- **Web Interface**: Bot control panel and monitoring available
+- **File Storage**: All data stored in files for lightweight deployment
 - **Error Handling**: Comprehensive error logging and recovery
 
 ## 🛠️ Development Commands
@@ -1048,7 +1051,7 @@ php artisan config:cache
 php artisan route:cache
 
 # Database setup
-php artisan migrate --force
+# No database required - uses file-based storage
 
 # Start services
 php artisan serve --host=0.0.0.0 --port=8000
@@ -1295,14 +1298,36 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🚀 Your Discord-to-ClickUp integration is ready! Send a message in Discord channel `1087467843584532510` and watch it appear in ClickUp chat channel `6-901209555432-8`!**
 
-### 🎯 Current Operational Status
+## 🗃️ Database-Free Architecture
 
-- **Discord Bot**: ✅ Connected and monitoring (Pure PHP)
-- **Message Processing**: ✅ Real-time with file-based storage
-- **ClickUp Integration**: ✅ Messages forwarded successfully
-- **Web Interface**: ✅ Bot control panel and monitoring available
-- **File Storage**: ✅ All data stored in files for lightweight deployment
-- **Error Handling**: ✅ Comprehensive error recovery
-- **Architecture**: ✅ Streamlined backend-only with web interface
+This application is **completely database-free** and uses file-based storage for all data:
 
-**Ready for live testing! 🎉**
+### 📁 **File Storage Locations**
+
+- **Messages**: `storage/app/discord_messages.json` - All Discord message data
+- **ClickUp Tokens**: `storage/app/clickup_token.json` - Authentication tokens
+- **Sessions**: `storage/framework/sessions/` - User session files
+- **Cache**: `storage/framework/cache/` - Application cache files
+- **Logs**: `storage/logs/laravel.log` - Application logs
+
+### 🚀 **Benefits**
+
+- ✅ **Zero Database Setup** - No MySQL, PostgreSQL, or SQLite required
+- ✅ **Easy Deployment** - Deploy anywhere without database configuration
+- ✅ **Lightweight** - No database overhead or connection management
+- ✅ **Portable** - All data stored in simple JSON files
+- ✅ **Version Control Friendly** - Data files can be easily backed up
+
+### ⚙️ **Laravel Configuration**
+
+Laravel is configured to use an in-memory array driver for database operations, which satisfies Laravel's core requirements without any actual database connection:
+
+```php
+// config/database.php
+'default' => 'array',
+'connections' => [
+    'array' => ['driver' => 'array']
+]
+```
+
+This approach gives you all the power of Laravel's framework without the complexity of database management.

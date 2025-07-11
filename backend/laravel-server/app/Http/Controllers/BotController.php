@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Services\DiscordBotService;
 use App\Services\ClickUpService;
+use App\Services\FileMessageService;
 
 class BotController extends Controller
 {
@@ -84,25 +85,10 @@ class BotController extends Controller
      */
     public function getMessages(Request $request): JsonResponse
     {
+        $fileMessageService = app(FileMessageService::class);
         $limit = $request->get('limit', 50);
-        $after = $request->get('after', 0);
         
-        $query = \App\Models\DiscordMessage::orderBy('discord_timestamp', 'desc');
-        
-        // If 'after' parameter is provided, get messages newer than that ID
-        if ($after > 0) {
-            $query->where('discord_message_id', '>', $after);
-        }
-        
-        $messages = $query->limit($limit)->get()->map(function ($message) {
-            return [
-                'id' => $message->discord_message_id,
-                'username' => $message->username,
-                'content' => $message->content,
-                'timestamp' => $message->discord_timestamp,
-                'sent_to_clickup' => $message->clickup_sent ?? false
-            ];
-        });
+        $messages = $fileMessageService->getRecentMessages($limit);
         
         return response()->json($messages);
     }
@@ -128,5 +114,16 @@ class BotController extends Controller
             'message' => 'Retry completed',
             'results' => $results
         ]);
+    }
+
+    /**
+     * Get storage statistics
+     */
+    public function getStats(): JsonResponse
+    {
+        $fileMessageService = app(FileMessageService::class);
+        $stats = $fileMessageService->getStats();
+        
+        return response()->json($stats);
     }
 }

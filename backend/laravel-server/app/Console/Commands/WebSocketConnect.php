@@ -362,26 +362,44 @@ class WebSocketConnect extends Command
         
         $this->info("🔄 Processing message from {$username}{$botInfo}: {$content}");
 
-        // Forward the message to ClickUp
+        // **STORE THE MESSAGE FIRST** using FileMessageService
         try {
-            $result = $this->forwardMessageToClickUp($data);
+            $fileMessageService = app(\App\Services\FileMessageService::class);
+            
+            // Prepare message data for storage
+            $messageData = [
+                'discord_message_id' => $data['id'] ?? '',
+                'channel_id' => $data['channel_id'] ?? '',
+                'username' => $data['author']['username'] ?? 'Unknown',
+                'content' => $data['content'] ?? '',
+                'discord_timestamp' => isset($data['timestamp']) ? 
+                    \Carbon\Carbon::parse($data['timestamp'])->format('Y-m-d H:i:s') : 
+                    now()->format('Y-m-d H:i:s'),
+                'clickup_sent' => false, // Will be updated after forwarding
+                'clickup_channel_id' => null,
+                'clickup_response' => null,
+                'error_message' => null,
+            ];
+            
+            // Store the message first
+            $storedMessage = $fileMessageService->storeMessage($messageData);
+            $this->info("💾 Message stored in file with ID: " . $storedMessage['id']);
+            
+            // Forward the message to ClickUp and update storage
+            $result = $this->forwardMessageToClickUp($data, $storedMessage['id']);
             
             if ($result['success']) {
                 $this->info("✅ Message forwarded to ClickUp successfully");
             } else {
-                $this->warn("❌ Failed to forward message to ClickUp: " . ($result['error'] ?? 'Unknown error'));
+                $this->error("❌ Failed to forward message to ClickUp: " . ($result['error'] ?? 'Unknown error'));
             }
             
         } catch (\Exception $e) {
-            $this->error("Error processing message: " . $e->getMessage());
-            Log::error('Discord message processing error', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            $this->error("❌ Error processing/storing message: " . $e->getMessage());
         }
     }
 
-    private function forwardMessageToClickUp($messageData)
+    private function forwardMessageToClickUp($messageData, $storedMessageId = null)
     {
         try {
             // Get ClickUp service
@@ -440,6 +458,33 @@ class WebSocketConnect extends Command
 
             // Send to ClickUp
             $result = $clickUpService->sendMessage($content, $clickUpChannelId);
+
+            // **UPDATE THE STORED MESSAGE** with ClickUp response
+            if ($storedMessageId) {
+                try {
+                    $fileMessageService = app(\App\Services\FileMessageService::class);
+                    
+                    if ($result['success']) {
+                        $fileMessageService->updateMessage($storedMessageId, [
+                            'clickup_sent' => true,
+                            'clickup_channel_id' => $clickUpChannelId,
+                            'clickup_response' => $result['data'] ?? $result,
+                            'error_message' => null,
+                        ]);
+                        $this->info("💾 Updated stored message with successful ClickUp response");
+                    } else {
+                        $fileMessageService->updateMessage($storedMessageId, [
+                            'clickup_sent' => false,
+                            'clickup_channel_id' => $clickUpChannelId,
+                            'clickup_response' => null,
+                            'error_message' => $result['error'] ?? 'Unknown error',
+                        ]);
+                        $this->info("💾 Updated stored message with ClickUp error");
+                    }
+                } catch (\Exception $updateException) {
+                    $this->error("❌ Failed to update stored message: " . $updateException->getMessage());
+                }
+            }
 
             if ($result['success']) {
                 Log::info('✅ Message sent to ClickUp chat channel successfully');

@@ -6,19 +6,19 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use App\Services\ClickUpService;
+use App\Services\FileMessageService;
 use App\Events\NewDiscordMessage;
-use App\Models\DiscordMessage;
-use App\Models\BotStatus;
 
 class DiscordBotService
 {
     private const BOT_STATUS_KEY = 'discord_bot_status';
     private const MESSAGES_CACHE_KEY = 'recent_discord_messages';
 
-    public function __construct()
+    private FileMessageService $fileMessageService;
+
+    public function __construct(FileMessageService $fileMessageService)
     {
-        // Removed ClickUpService dependency injection to avoid circular dependency issues
-        // Will use app() to resolve when needed
+        $this->fileMessageService = $fileMessageService;
     }
 
     /**
@@ -26,8 +26,8 @@ class DiscordBotService
      */
     public function isOnline(): bool
     {
-        $status = BotStatus::getDiscordBotStatus();
-        return $status ? $status->isOnline() : false;
+        $status = $this->fileMessageService->getBotStatus();
+        return ($status['status'] ?? 'disconnected') === 'connected';
     }
 
     /**
@@ -35,14 +35,12 @@ class DiscordBotService
      */
     public function start(): void
     {
-        BotStatus::updateStatus('discord-bot', true, [
+        $this->fileMessageService->updateBotStatus([
+            'status' => 'connected',
             'started_at' => now()->toISOString(),
             'version' => '1.0.0'
         ]);
         Log::info('🤖 Discord bot started');
-        
-        // In a real implementation, you would start the actual Discord bot process here
-        // This could be done via a command, queue job, or external process management
     }
 
     /**
@@ -50,7 +48,10 @@ class DiscordBotService
      */
     public function stop(): void
     {
-        BotStatus::updateStatus('discord-bot', false);
+        $this->fileMessageService->updateBotStatus([
+            'status' => 'disconnected',
+            'stopped_at' => now()->toISOString()
+        ]);
         Log::info('❌ Discord bot stopped');
     }
 
@@ -59,17 +60,7 @@ class DiscordBotService
      */
     public function getRecentMessages(): array
     {
-        return DiscordMessage::getRecent(50)
-            ->map(function ($message) {
-                return [
-                    'id' => $message->discord_message_id,
-                    'username' => $message->username,
-                    'content' => $message->content,
-                    'timestamp' => $message->discord_timestamp->toISOString(),
-                    'sent_to_clickup' => $message->sent_to_clickup,
-                ];
-            })
-            ->toArray();
+        return $this->fileMessageService->getRecentMessages();
     }
 
     /**
@@ -106,15 +97,15 @@ class DiscordBotService
                   "🔗 [View message in Discord]({$discordLink})\n" .
                   $attachmentLinks;
 
-        // Store message in database
-        $discordMessage = DiscordMessage::create([
-            'discord_message_id' => $messageData['id'],
+        // Store message in file storage
+        $messageId = $messageData['id'] ?? uniqid();
+        $this->fileMessageService->storeMessage([
+            'discord_message_id' => $messageId,
             'channel_id' => $messageData['channel_id'],
-            'guild_id' => $messageData['guild_id'],
-            'username' => $messageData['author']['username'],
-            'content' => $messageData['content'],
-            'attachments' => $messageData['attachments'] ?? [],
-            'discord_timestamp' => date('Y-m-d H:i:s', $messageData['timestamp'] / 1000),
+            'username' => $messageData['author']['username'] ?? 'Unknown',
+            'content' => $messageData['content'] ?? '',
+            'discord_timestamp' => date('Y-m-d H:i:s', ($messageData['timestamp'] ?? time() * 1000) / 1000),
+            'clickup_sent' => false,
         ]);
 
         // Send to ClickUp using the mapped channel
@@ -125,17 +116,20 @@ class DiscordBotService
             Log::info('✅ Message sent to ClickUp channel');
             
             // Mark as sent to ClickUp
-            $discordMessage->markAsSentToClickUp($result['response']['id'] ?? null);
+            $this->fileMessageService->markAsSentToClickUp($messageId, $clickUpChannelId, $result['response'] ?? null);
 
             // Broadcast to frontend (using Laravel Broadcasting)
             broadcast(new NewDiscordMessage([
-                'username' => $messageData['author']['username'],
-                'content' => $messageData['content'],
+                'username' => $messageData['author']['username'] ?? 'Unknown',
+                'content' => $messageData['content'] ?? '',
                 'timestamp' => $timestamp,
             ]));
 
             return ['processed' => true, 'clickup_result' => $result];
         } else {
+            // Mark as failed
+            $this->fileMessageService->markAsFailed($messageId, $result['message'] ?? 'Unknown error');
+            
             if ($result['status'] === 401) {
                 Log::warning('🔁 Re-authentication required. Visit /auth/clickup to log in again.');
             } else {
@@ -158,12 +152,9 @@ class DiscordBotService
     /**
      * Get failed messages that need to be retried
      */
-    public function getFailedMessages(): \Illuminate\Database\Eloquent\Collection
+    public function getFailedMessages(): array
     {
-        return DiscordMessage::notSentToClickUp()
-            ->watchedChannels()
-            ->orderBy('discord_timestamp', 'asc')
-            ->get();
+        return $this->fileMessageService->getFailedMessages();
     }
 
     /**
@@ -176,13 +167,11 @@ class DiscordBotService
 
         foreach ($failedMessages as $message) {
             $messageData = [
-                'id' => $message->discord_message_id,
-                'channel_id' => $message->channel_id,
-                'guild_id' => $message->guild_id,
-                'author' => ['username' => $message->username, 'discriminator' => '0000'],
-                'content' => $message->content,
-                'timestamp' => $message->discord_timestamp->timestamp * 1000,
-                'attachments' => $message->attachments ?? [],
+                'id' => $message['discord_message_id'],
+                'channel_id' => $message['channel_id'],
+                'author' => ['username' => $message['username']],
+                'content' => $message['content'],
+                'timestamp' => strtotime($message['discord_timestamp']) * 1000,
             ];
 
             $result = $this->processDiscordMessage($messageData);
